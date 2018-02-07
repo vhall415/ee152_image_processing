@@ -1,0 +1,464 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>EE 152 Lab2: Fun with Sampling, Registration, and Quantization - Victoria Hall, 861154075</title><meta name="generator" content="MATLAB 9.2"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2018-01-21"><meta name="DC.source" content="ee152_lab2.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>EE 152 Lab2: Fun with Sampling, Registration, and Quantization - Victoria Hall, 861154075</h1><!--introduction--><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">L2.1 Sampling and Resizing</a></li><li><a href="#8">L2.2 Quantization</a></li><li><a href="#11">L2.3 Registration and Detection</a></li></ul></div><h2 id="1">L2.1 Sampling and Resizing</h2><p>Capture two color images # with sharp edges and frequences (e.g., a fence or some other repeating pattern) # with uniform regions and low frequencies (e.g., a cloudy sky or a portrait image with a soft background)</p><p>You may use standard images Barbara and Lena for refernce and initial testing, but the report must include results on original images captured by you.</p><p>a) Resize your images to 128x128 resolution using imresize() with and without anti-aliasing filter. Explain which sampling approach is better and why.</p><p>b) Resize your 128x128 images to 512x512 resolution using imresize() with different interpolation schemes: # nearest neighbor # bilinear # bicubic</p><pre class="codeinput">I_sharp = imread(<span class="string">'sharp.jpg'</span>);
+I_uni = imread(<span class="string">'uniform.jpg'</span>);
+
+figure;
+imshow(I_sharp)
+title(<span class="string">'Original Sharp Edge Image'</span>);
+figure;
+imshow(I_uni)
+title(<span class="string">'Original Uniform Regions Image'</span>);
+</pre><pre class="codeoutput">Warning: Image is too big to fit on screen; displaying at 50% 
+Warning: Image is too big to fit on screen; displaying at 33% 
+</pre><img vspace="5" hspace="5" src="ee152_lab2_01.png" style="width:964px;height:700px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab2_02.png" style="width:556px;height:632px;" alt=""> <p>Part A. Images resized to 128x128 with anti-aliasing</p><pre class="codeinput">I_sharp128_anti_on = imresize(I_sharp, [128 128], <span class="string">'Antialiasing'</span>, true);
+I_uni128_anti_on = imresize(I_uni, [128 128], <span class="string">'Antialiasing'</span>, true);
+
+figure;
+imshow(I_sharp128_anti_on);
+title({<span class="string">'Resized Sharp Image 128x128'</span>, <span class="string">'with Anti-Aliasing'</span>});
+set(gcf, <span class="string">'Position'</span>, [500, 500, 300, 250])
+figure;
+imshow(I_uni128_anti_on);
+title({<span class="string">'Resized Uniform Image 128x128'</span>, <span class="string">'with Anti-Aliasing'</span>});
+set(gcf, <span class="string">'Position'</span>, [500, 500, 300, 250])
+</pre><img vspace="5" hspace="5" src="ee152_lab2_03.png" style="width:300px;height:250px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab2_04.png" style="width:300px;height:250px;" alt=""> <p>Part A. Images resized to 128x128 without anti-aliasing</p><pre class="codeinput">I_sharp128_anti_off = imresize(I_sharp, [128 128], <span class="string">'Antialiasing'</span>, false);
+I_uni128_anti_off = imresize(I_uni, [128 128], <span class="string">'Antialiasing'</span>, false);
+
+figure;
+imshow(I_sharp128_anti_off);
+title({<span class="string">'Resized Sharp Image 128x128'</span>, <span class="string">'without Anti-Aliasing'</span>});
+set(gcf, <span class="string">'Position'</span>, [500, 500, 300, 250])
+figure;
+imshow(I_uni128_anti_off);
+title({<span class="string">'Resized Uniform Image 128x128'</span>, <span class="string">'without Anti-Aliasing'</span>});
+set(gcf, <span class="string">'Position'</span>, [500, 500, 300, 250])
+</pre><img vspace="5" hspace="5" src="ee152_lab2_05.png" style="width:300px;height:250px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab2_06.png" style="width:300px;height:250px;" alt=""> <p>The image resizing with anti-aliasing is better because the repeating black lines of the sharp edges image retain more of their black-then-tan pattern, while the image without anti-aliasing shows more tan where some of the black should be. The image without anti-aliasing looks more different from the original image than the image with anti-aliasing.</p><p>Part B. 128x128 images resized to 512x512 with nearest neighbor interpolation.</p><pre class="codeinput">I_sharp512_near = imresize(I_sharp128_anti_on, [512 512], <span class="string">'nearest'</span>);
+I_uni512_near = imresize(I_uni128_anti_on, [512 512], <span class="string">'nearest'</span>);
+
+figure;
+imshow(I_sharp512_near);
+title({<span class="string">'128x128 Sharp Image Resized to 512x512'</span>, <span class="string">'with Nearest Neighbor Interpolation'</span>});
+set(gcf, <span class="string">'Position'</span>, [500, 100, 500, 500])
+figure;
+imshow(I_uni512_near);
+title({<span class="string">'128x128 Uniform Image Resized to 512x512'</span>, <span class="string">'with Nearest Neighbor Interpolation'</span>});
+set(gcf, <span class="string">'Position'</span>, [500, 100, 500, 500])
+</pre><img vspace="5" hspace="5" src="ee152_lab2_07.png" style="width:500px;height:500px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab2_08.png" style="width:500px;height:500px;" alt=""> <p>Part B. 128x128 images resized to 512x512 with bilinear interpolation.</p><pre class="codeinput">I_sharp512_bil = imresize(I_sharp128_anti_on, [512 512], <span class="string">'bilinear'</span>);
+I_uni512_bil = imresize(I_uni128_anti_on, [512 512], <span class="string">'bilinear'</span>);
+
+figure;
+imshow(I_sharp512_bil);
+title({<span class="string">'128x128 Sharp Image Resized to 512x512'</span>, <span class="string">'with Bilinear Interpolation'</span>});
+set(gcf, <span class="string">'Position'</span>, [500, 100, 500, 500])
+figure;
+imshow(I_uni512_bil);
+title({<span class="string">'128x128 Uniform Image Resized to 512x512'</span>, <span class="string">'with Bilinear Interpolation'</span>});
+set(gcf, <span class="string">'Position'</span>, [500, 100, 500, 500])
+</pre><img vspace="5" hspace="5" src="ee152_lab2_09.png" style="width:500px;height:500px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab2_10.png" style="width:500px;height:500px;" alt=""> <p>Part B. 128x128 images resized to 512x512 with bicubic interpolation.</p><pre class="codeinput">I_sharp512_bic = imresize(I_sharp128_anti_on, [512 512], <span class="string">'bicubic'</span>);
+I_uni512_bic = imresize(I_uni128_anti_on, [512 512], <span class="string">'bicubic'</span>);
+
+figure;
+imshow(I_sharp512_bic);
+title({<span class="string">'128x128 Sharp Image Resized to 512x512'</span>, <span class="string">'with Bicubic Interpolation'</span>});
+set(gcf, <span class="string">'Position'</span>, [500, 100, 500, 500])
+figure;
+imshow(I_uni512_bic);
+title({<span class="string">'128x128 Uniform Image Resized to 512x512'</span>, <span class="string">'with Bicubic Interpolation'</span>});
+set(gcf, <span class="string">'Position'</span>, [500, 100, 500, 500])
+</pre><img vspace="5" hspace="5" src="ee152_lab2_11.png" style="width:500px;height:500px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab2_12.png" style="width:500px;height:500px;" alt=""> <h2 id="8">L2.2 Quantization</h2><p>Use 128x128 images from the previous step. Start with 8-bit representation (256-level quantization) of each color channel and reduce the number of quantization levels by removing the least significant bit one by one.</p><p>a) Display your results for all quantization levels</p><p>b) Explain at what levels do you see false contouring (the effect where instead of noticing a gradual change of intensity, we notice connected regions/contours with same intensities)</p><p>c) To avoid false contouring, try adding a small amount of random noise in the image before quantization</p><pre class="codeinput">I_sharp_quant = I_sharp128_anti_on;
+figure;
+imshow(I_sharp_quant)
+title({<span class="string">'Sharp Image Quantization'</span>, strcat(<span class="string">'with '</span>, num2str(8), <span class="string">'-bit Representation'</span>)});
+set(gcf, <span class="string">'Position'</span>, [500, 500, 300, 250])
+
+<span class="keyword">for</span> i = 1:8
+    I_sharp_quant = bitset(I_sharp_quant, i, 0);
+    figure;
+    imshow(I_sharp_quant)
+    title({<span class="string">'Sharp Image Quantization'</span>, strcat(<span class="string">'with '</span>, num2str(8-i), <span class="string">'-bit Representation'</span>)});
+    set(gcf, <span class="string">'Position'</span>, [500, 500, 300, 250])
+<span class="keyword">end</span>
+
+I_uni_quant = I_uni128_anti_on;
+figure;
+imshow(I_uni_quant)
+title({<span class="string">'Sharp Image Quantization'</span>, strcat(<span class="string">'with '</span>, num2str(8), <span class="string">'-bit Representation'</span>)});
+set(gcf, <span class="string">'Position'</span>, [500, 500, 300, 250])
+
+<span class="keyword">for</span> i = 1:8
+    I_uni_quant = bitset(I_uni_quant, i, 0);
+    figure;
+    imshow(I_uni_quant)
+    title({<span class="string">'Sharp Image Quantization'</span>, strcat(<span class="string">'with '</span>, num2str(8-i), <span class="string">'-bit Representation'</span>)});
+    set(gcf, <span class="string">'Position'</span>, [500, 500, 300, 250])
+<span class="keyword">end</span>
+</pre><img vspace="5" hspace="5" src="ee152_lab2_13.png" style="width:300px;height:250px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab2_14.png" style="width:300px;height:250px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab2_15.png" style="width:300px;height:250px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab2_16.png" style="width:300px;height:250px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab2_17.png" style="width:300px;height:250px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab2_18.png" style="width:300px;height:250px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab2_19.png" style="width:300px;height:250px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab2_20.png" style="width:300px;height:250px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab2_21.png" style="width:300px;height:250px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab2_22.png" style="width:300px;height:250px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab2_23.png" style="width:300px;height:250px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab2_24.png" style="width:300px;height:250px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab2_25.png" style="width:300px;height:250px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab2_26.png" style="width:300px;height:250px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab2_27.png" style="width:300px;height:250px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab2_28.png" style="width:300px;height:250px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab2_29.png" style="width:300px;height:250px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab2_30.png" style="width:300px;height:250px;" alt=""> <p>You start to see false contouring at the 5-bit representation level.</p><pre class="codeinput">I_sharp_noise = imnoise(I_sharp128_anti_on, <span class="string">'gaussian'</span>, 0, 0.0001);
+figure;
+imshow(I_sharp_noise)
+title({<span class="string">'Sharp Image Quantization'</span>, strcat(<span class="string">'with '</span>, num2str(8), <span class="string">'-bit Representation'</span>)});
+set(gcf, <span class="string">'Position'</span>, [500, 500, 300, 250])
+
+<span class="keyword">for</span> i = 1:8
+    I_sharp_noise = bitset(I_sharp_noise, i, 0);
+    figure;
+    imshow(I_sharp_noise)
+    title({<span class="string">'Sharp Image Quantization'</span>, strcat(<span class="string">'with '</span>, num2str(8-i), <span class="string">'-bit Representation'</span>)});
+    set(gcf, <span class="string">'Position'</span>, [500, 500, 300, 250])
+<span class="keyword">end</span>
+
+I_uni_noise = imnoise(I_uni128_anti_on, <span class="string">'gaussian'</span>, 0, 0.0001);
+figure;
+imshow(I_uni_noise)
+title({<span class="string">'Sharp Image Quantization'</span>, strcat(<span class="string">'with '</span>, num2str(8), <span class="string">'-bit Representation'</span>)});
+set(gcf, <span class="string">'Position'</span>, [500, 500, 300, 250])
+
+<span class="keyword">for</span> i = 1:8
+    I_uni_noise = bitset(I_uni_noise, i, 0);
+    figure;
+    imshow(I_uni_noise)
+    title({<span class="string">'Sharp Image Quantization'</span>, strcat(<span class="string">'with '</span>, num2str(8-i), <span class="string">'-bit Representation'</span>)});
+    set(gcf, <span class="string">'Position'</span>, [500, 500, 300, 250])
+<span class="keyword">end</span>
+</pre><img vspace="5" hspace="5" src="ee152_lab2_31.png" style="width:300px;height:250px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab2_32.png" style="width:300px;height:250px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab2_33.png" style="width:300px;height:250px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab2_34.png" style="width:300px;height:250px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab2_35.png" style="width:300px;height:250px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab2_36.png" style="width:300px;height:250px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab2_37.png" style="width:300px;height:250px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab2_38.png" style="width:300px;height:250px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab2_39.png" style="width:300px;height:250px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab2_40.png" style="width:300px;height:250px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab2_41.png" style="width:300px;height:250px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab2_42.png" style="width:300px;height:250px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab2_43.png" style="width:300px;height:250px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab2_44.png" style="width:300px;height:250px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab2_45.png" style="width:300px;height:250px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab2_46.png" style="width:300px;height:250px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab2_47.png" style="width:300px;height:250px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab2_48.png" style="width:300px;height:250px;" alt=""> <p>By adding a little bit of noise to the original image before quantizing it at different levels, the false contouring doesn't happen until a later quantization level.</p><h2 id="11">L2.3 Registration and Detection</h2><p>Ask one of your frieds to capture two pictures for you in front of a static background with a hand-held camera: one with you in the frame and the other with the background only.</p><p>a) Register the two images if needed</p><p>b) Compute a difference image between the registered copies of the two images</p><p>c) Design a thresholding scheme that converts the difference image into a binary image with all the background pixels assigned 0 value and all the pixels where you are present assigned 1.</p><pre class="codeinput">fixed = rgb2gray(imread(<span class="string">'wall.jpg'</span>));
+moving = rgb2gray(imread(<span class="string">'me.jpg'</span>));
+
+figure;
+imshow(fixed);
+title(<span class="string">'Background Only'</span>);
+figure;
+imshow(moving);
+title(<span class="string">'Backgound With Me'</span>);
+
+[optimizer, metric] = imregconfig(<span class="string">'multimodal'</span>);
+
+register = imregister(moving, fixed, <span class="string">'affine'</span>, optimizer, metric);
+
+figure;
+imshowpair(register, fixed)
+title(<span class="string">'Registed Image'</span>)
+
+diff = imabsdiff(register, fixed);
+
+figure;
+imshow(diff);
+title(<span class="string">'Difference Image'</span>);
+
+thresh = graythresh(diff); <span class="comment">% Otsu threshold algorithm</span>
+imthresh  = imbinarize(diff, thresh);
+figure;
+imshow(imthresh)
+title(<span class="string">'Binary Image'</span>);
+</pre><pre class="codeoutput">Warning: Image is too big to fit on screen; displaying at 33% 
+Warning: Image is too big to fit on screen; displaying at 33% 
+Warning: Image is too big to fit on screen; displaying at 33% 
+Warning: Image is too big to fit on screen; displaying at 33% 
+Warning: Image is too big to fit on screen; displaying at 33% 
+</pre><img vspace="5" hspace="5" src="ee152_lab2_49.png" style="width:556px;height:632px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab2_50.png" style="width:556px;height:632px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab2_51.png" style="width:556px;height:632px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab2_52.png" style="width:556px;height:632px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab2_53.png" style="width:556px;height:632px;" alt=""> <p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2017a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% EE 152 Lab2: Fun with Sampling, Registration, and Quantization - Victoria Hall, 861154075
+
+%% L2.1 Sampling and Resizing
+% Capture two color images
+% # with sharp edges and frequences (e.g., a fence or some other repeating
+% pattern)
+% # with uniform regions and low frequencies (e.g., a cloudy sky or a
+% portrait image with a soft background)
+%
+% You may use standard images Barbara and Lena for refernce and initial
+% testing, but the report must include results on original images captured
+% by you.
+%
+% a) Resize your images to 128x128 resolution using imresize() with and
+% without anti-aliasing filter. Explain which sampling approach is better
+% and why.
+%
+% b) Resize your 128x128 images to 512x512 resolution using imresize() with
+% different interpolation schemes:
+% # nearest neighbor
+% # bilinear
+% # bicubic
+
+I_sharp = imread('sharp.jpg');
+I_uni = imread('uniform.jpg');
+
+figure;
+imshow(I_sharp)
+title('Original Sharp Edge Image');
+figure;
+imshow(I_uni)
+title('Original Uniform Regions Image');
+
+%%
+% Part A. Images resized to 128x128 with anti-aliasing
+
+I_sharp128_anti_on = imresize(I_sharp, [128 128], 'Antialiasing', true);
+I_uni128_anti_on = imresize(I_uni, [128 128], 'Antialiasing', true);
+
+figure;
+imshow(I_sharp128_anti_on);
+title({'Resized Sharp Image 128x128', 'with Anti-Aliasing'});
+set(gcf, 'Position', [500, 500, 300, 250])
+figure;
+imshow(I_uni128_anti_on);
+title({'Resized Uniform Image 128x128', 'with Anti-Aliasing'});
+set(gcf, 'Position', [500, 500, 300, 250])
+
+%%
+% Part A. Images resized to 128x128 without anti-aliasing
+
+I_sharp128_anti_off = imresize(I_sharp, [128 128], 'Antialiasing', false);
+I_uni128_anti_off = imresize(I_uni, [128 128], 'Antialiasing', false);
+
+figure;
+imshow(I_sharp128_anti_off);
+title({'Resized Sharp Image 128x128', 'without Anti-Aliasing'});
+set(gcf, 'Position', [500, 500, 300, 250])
+figure;
+imshow(I_uni128_anti_off);
+title({'Resized Uniform Image 128x128', 'without Anti-Aliasing'});
+set(gcf, 'Position', [500, 500, 300, 250])
+
+%%
+% The image resizing with anti-aliasing is better because the repeating
+% black lines of the sharp edges image retain more of their black-then-tan
+% pattern, while the image without anti-aliasing shows more tan where some
+% of the black should be. The image without anti-aliasing looks more different from the
+% original image than the image with anti-aliasing.
+
+%%
+% Part B. 128x128 images resized to 512x512 with nearest neighbor interpolation.
+
+I_sharp512_near = imresize(I_sharp128_anti_on, [512 512], 'nearest');
+I_uni512_near = imresize(I_uni128_anti_on, [512 512], 'nearest');
+
+figure;
+imshow(I_sharp512_near);
+title({'128x128 Sharp Image Resized to 512x512', 'with Nearest Neighbor Interpolation'});
+set(gcf, 'Position', [500, 100, 500, 500])
+figure;
+imshow(I_uni512_near);
+title({'128x128 Uniform Image Resized to 512x512', 'with Nearest Neighbor Interpolation'});
+set(gcf, 'Position', [500, 100, 500, 500])
+
+%%
+% Part B. 128x128 images resized to 512x512 with bilinear interpolation.
+
+I_sharp512_bil = imresize(I_sharp128_anti_on, [512 512], 'bilinear');
+I_uni512_bil = imresize(I_uni128_anti_on, [512 512], 'bilinear');
+
+figure;
+imshow(I_sharp512_bil);
+title({'128x128 Sharp Image Resized to 512x512', 'with Bilinear Interpolation'});
+set(gcf, 'Position', [500, 100, 500, 500])
+figure;
+imshow(I_uni512_bil);
+title({'128x128 Uniform Image Resized to 512x512', 'with Bilinear Interpolation'});
+set(gcf, 'Position', [500, 100, 500, 500])
+
+%%
+% Part B. 128x128 images resized to 512x512 with bicubic interpolation.
+
+I_sharp512_bic = imresize(I_sharp128_anti_on, [512 512], 'bicubic');
+I_uni512_bic = imresize(I_uni128_anti_on, [512 512], 'bicubic');
+
+figure;
+imshow(I_sharp512_bic);
+title({'128x128 Sharp Image Resized to 512x512', 'with Bicubic Interpolation'});
+set(gcf, 'Position', [500, 100, 500, 500])
+figure;
+imshow(I_uni512_bic);
+title({'128x128 Uniform Image Resized to 512x512', 'with Bicubic Interpolation'});
+set(gcf, 'Position', [500, 100, 500, 500])
+
+
+%% L2.2 Quantization
+% Use 128x128 images from the previous step. Start with 8-bit
+% representation (256-level quantization) of each color channel and reduce
+% the number of quantization levels by removing the least significant bit
+% one by one.
+%
+% a) Display your results for all quantization levels
+%
+% b) Explain at what levels do you see false contouring (the effect where
+% instead of noticing a gradual change of intensity, we notice connected
+% regions/contours with same intensities)
+%
+% c) To avoid false contouring, try adding a small amount of random noise
+% in the image before quantization
+
+I_sharp_quant = I_sharp128_anti_on;
+figure;
+imshow(I_sharp_quant)
+title({'Sharp Image Quantization', strcat('with ', num2str(8), '-bit Representation')});
+set(gcf, 'Position', [500, 500, 300, 250])
+
+for i = 1:8
+    I_sharp_quant = bitset(I_sharp_quant, i, 0);
+    figure;
+    imshow(I_sharp_quant)
+    title({'Sharp Image Quantization', strcat('with ', num2str(8-i), '-bit Representation')});
+    set(gcf, 'Position', [500, 500, 300, 250])
+end
+
+I_uni_quant = I_uni128_anti_on;
+figure;
+imshow(I_uni_quant)
+title({'Sharp Image Quantization', strcat('with ', num2str(8), '-bit Representation')});
+set(gcf, 'Position', [500, 500, 300, 250])
+
+for i = 1:8
+    I_uni_quant = bitset(I_uni_quant, i, 0);
+    figure;
+    imshow(I_uni_quant)
+    title({'Sharp Image Quantization', strcat('with ', num2str(8-i), '-bit Representation')});
+    set(gcf, 'Position', [500, 500, 300, 250])
+end
+
+%%
+% You start to see false contouring at the 5-bit representation level.
+
+I_sharp_noise = imnoise(I_sharp128_anti_on, 'gaussian', 0, 0.0001);
+figure;
+imshow(I_sharp_noise)
+title({'Sharp Image Quantization', strcat('with ', num2str(8), '-bit Representation')});
+set(gcf, 'Position', [500, 500, 300, 250])
+
+for i = 1:8
+    I_sharp_noise = bitset(I_sharp_noise, i, 0);
+    figure;
+    imshow(I_sharp_noise)
+    title({'Sharp Image Quantization', strcat('with ', num2str(8-i), '-bit Representation')});
+    set(gcf, 'Position', [500, 500, 300, 250])
+end
+
+I_uni_noise = imnoise(I_uni128_anti_on, 'gaussian', 0, 0.0001);
+figure;
+imshow(I_uni_noise)
+title({'Sharp Image Quantization', strcat('with ', num2str(8), '-bit Representation')});
+set(gcf, 'Position', [500, 500, 300, 250])
+
+for i = 1:8
+    I_uni_noise = bitset(I_uni_noise, i, 0);
+    figure;
+    imshow(I_uni_noise)
+    title({'Sharp Image Quantization', strcat('with ', num2str(8-i), '-bit Representation')});
+    set(gcf, 'Position', [500, 500, 300, 250])
+end
+
+%%
+% By adding a little bit of noise to the original image before quantizing
+% it at different levels, the false contouring doesn't happen until a later
+% quantization level.
+
+%% L2.3 Registration and Detection
+% Ask one of your frieds to capture two pictures for you in front of a
+% static background with a hand-held camera: one with you in the frame and
+% the other with the background only.
+%
+% a) Register the two images if needed
+%
+% b) Compute a difference image between the registered copies of the two
+% images
+%
+% c) Design a thresholding scheme that converts the difference image into a
+% binary image with all the background pixels assigned 0 value and all the
+% pixels where you are present assigned 1.
+
+fixed = rgb2gray(imread('wall.jpg'));
+moving = rgb2gray(imread('me.jpg'));
+
+figure;
+imshow(fixed);
+title('Background Only');
+figure;
+imshow(moving);
+title('Backgound With Me');
+
+[optimizer, metric] = imregconfig('multimodal');
+
+register = imregister(moving, fixed, 'affine', optimizer, metric);
+
+figure;
+imshowpair(register, fixed)
+title('Registed Image')
+
+diff = imabsdiff(register, fixed);
+
+figure;
+imshow(diff);
+title('Difference Image');
+
+thresh = graythresh(diff); % Otsu threshold algorithm
+imthresh  = imbinarize(diff, thresh);
+figure;
+imshow(imthresh)
+title('Binary Image');
+##### SOURCE END #####
+--></body></html>

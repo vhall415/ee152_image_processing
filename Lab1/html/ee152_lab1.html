@@ -1,0 +1,279 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>ee152_lab1</title><meta name="generator" content="MATLAB 9.2"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2018-01-15"><meta name="DC.source" content="ee152_lab1.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">L1.2</a></li><li><a href="#2">L1.3</a></li><li><a href="#3">L1.4</a></li><li><a href="#4">L1.5</a></li><li><a href="#5">L1.6</a></li><li><a href="#6">L1.7</a></li><li><a href="#7">L1.8</a></li><li><a href="#8">L1.9</a></li></ul></div><h2 id="1">L1.2</h2><p>Import the image into Matlab using imread() function. You may want to read Matlab documentation about different functions along the way (e.g., doc imread, imwrite).</p><pre class="codeinput">I = imread(<span class="string">'Victoria_Hall.jpg'</span>);
+gray = rgb2gray(I);
+</pre><h2 id="2">L1.3</h2><p>Display your image using imshow(), image(), imagesc(). Note that some of these functions do not work with RGB images. Convert RGB image to grayscale, if needed, using rgb2gray() for display.</p><p>I noticed that the grayscale images are displayed differently when using image() and imagesec() in that image() appears more yellow while imagesec() shows more depth to the picture.</p><pre class="codeinput">figure;
+imshow(I);
+figure;
+image(I);
+figure;
+imagesc(I);
+figure;
+imshow(gray);
+figure;
+image(gray);
+figure;
+imagesc(gray);
+</pre><img vspace="5" hspace="5" src="ee152_lab1_01.png" style="width:628px;height:728px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab1_02.png" style="width:560px;height:420px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab1_03.png" style="width:560px;height:420px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab1_04.png" style="width:628px;height:728px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab1_05.png" style="width:560px;height:420px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab1_06.png" style="width:560px;height:420px;" alt=""> <h2 id="3">L1.4</h2><p>Resize your image to 256 &times; 256 resolution using imresize().</p><pre class="codeinput">I2 = imresize(I, [256 256]);
+figure;
+imshow(I2);
+</pre><img vspace="5" hspace="5" src="ee152_lab1_07.png" style="width:276px;height:216px;" alt=""> <h2 id="4">L1.5</h2><p>Manually select and crop a region in the image that contains your face alone. For instance, if your face lies within a rectangle with corners (y_topleft,x_topleft), (y_bottomright, x_bottomright), then use face_image = full_image(y_topleft:y_bottomright, x_topleft:x_bottomright,:).</p><pre class="codeinput">y_topleft = 110;
+y_bottomright = 730;
+x_topleft = 260;
+x_bottomright = 680;
+face_image = I(y_topleft:y_bottomright, x_topleft:x_bottomright, :);
+figure;
+imshow(face_image);
+</pre><img vspace="5" hspace="5" src="ee152_lab1_08.png" style="width:359px;height:398px;" alt=""> <h2 id="5">L1.6</h2><p>Replace the region of your face with a box that has White, Black, Red, Blue, and Green stripes.</p><pre class="codeinput">width = (x_bottomright - x_topleft) / 5;
+height = y_bottomright - y_topleft;
+
+figure;
+imshow(I);
+rectangle(<span class="string">'Position'</span>, [x_topleft y_topleft width height], <span class="string">'FaceColor'</span>, <span class="string">'w'</span>);
+rectangle(<span class="string">'Position'</span>, [x_topleft+width y_topleft width height], <span class="string">'FaceColor'</span>, <span class="string">'k'</span>);
+rectangle(<span class="string">'Position'</span>, [x_topleft+(2*width) y_topleft width height], <span class="string">'FaceColor'</span>, <span class="string">'r'</span>);
+rectangle(<span class="string">'Position'</span>, [x_topleft+(3*width) y_topleft width height], <span class="string">'FaceColor'</span>, <span class="string">'b'</span>);
+rectangle(<span class="string">'Position'</span>, [x_topleft+(4*width) y_topleft width height], <span class="string">'FaceColor'</span>, <span class="string">'g'</span>);
+</pre><img vspace="5" hspace="5" src="ee152_lab1_09.png" style="width:628px;height:728px;" alt=""> <h2 id="6">L1.7</h2><p>Resize face image to 64 &times; 64 resolution.</p><pre class="codeinput">I3 = imresize(face_image, [64 64]);
+figure;
+imshow(I3);
+</pre><img vspace="5" hspace="5" src="ee152_lab1_10.png" style="width:180px;height:120px;" alt=""> <h2 id="7">L1.8</h2><p>Save your resized full image and face image using imwrite().</p><pre class="codeinput">imwrite(I2, <span class="string">'resized_full_image.jpg'</span>);
+imwrite(I3, <span class="string">'resized_face_image.jpg'</span>);
+
+I_full = imread(<span class="string">'resized_full_image.jpg'</span>);
+I_face = imread(<span class="string">'resized_face_image.jpg'</span>);
+
+figure;
+imshow(I_full);
+figure;
+imshow(I_face);
+</pre><img vspace="5" hspace="5" src="ee152_lab1_11.png" style="width:276px;height:216px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab1_12.png" style="width:180px;height:120px;" alt=""> <h2 id="8">L1.9</h2><p>Plot a histogram of intensities in your full and face images for each color channel. Use hist() to compute histograms and plot() to plot each histogram.</p><pre class="codeinput">Ir = I(:, :, 1);
+Ig = I(:, :, 2);
+Ib = I(:, :, 3);
+
+fr = face_image(:, :, 1);
+fg = face_image(:, :, 2);
+fb = face_image(:, :, 3);
+
+fullr = hist(double(Ir(:)), 255);
+fullg = hist(double(Ig(:)), 255);
+fullb = hist(double(Ib(:)), 255);
+
+facer = hist(double(fr(:)), 255);
+faceg = hist(double(fg(:)), 255);
+faceb = hist(double(fb(:)), 255);
+
+figure;
+bar(fullr, <span class="string">'r'</span>);
+title(<span class="string">'Full Image Red Channel'</span>);
+figure;
+bar(fullg, <span class="string">'g'</span>);
+title(<span class="string">'Full Image Green Channel'</span>);
+figure;
+bar(fullb, <span class="string">'b'</span>);
+title(<span class="string">'Full Image Blue Channel'</span>);
+
+figure;
+bar(facer, <span class="string">'r'</span>);
+title(<span class="string">'Face Image Red Channel'</span>);
+figure;
+bar(faceg, <span class="string">'g'</span>);
+title(<span class="string">'Face Image Green Channel'</span>);
+figure;
+bar(faceb, <span class="string">'b'</span>);
+title(<span class="string">'Face Image Blue Channel'</span>);
+</pre><img vspace="5" hspace="5" src="ee152_lab1_13.png" style="width:560px;height:420px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab1_14.png" style="width:560px;height:420px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab1_15.png" style="width:560px;height:420px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab1_16.png" style="width:560px;height:420px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab1_17.png" style="width:560px;height:420px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab1_18.png" style="width:560px;height:420px;" alt=""> <p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2017a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% L1.2
+% Import the image into Matlab using imread() function.
+% You may want to read Matlab documentation about different functions along
+% the way (e.g., doc imread, imwrite).
+
+I = imread('Victoria_Hall.jpg');
+gray = rgb2gray(I);
+
+%% L1.3
+% Display your image using imshow(), image(), imagesc().
+% Note that some of these functions do not work with RGB images.
+% Convert RGB image to grayscale, if needed, using rgb2gray() for display.
+%
+% I noticed that the grayscale images are displayed differently when using
+% image() and imagesec() in that image() appears more yellow while
+% imagesec() shows more depth to the picture.
+
+figure;
+imshow(I);
+figure;
+image(I);
+figure;
+imagesc(I);
+figure;
+imshow(gray);
+figure;
+image(gray);
+figure;
+imagesc(gray);
+
+%% L1.4
+% Resize your image to 256 × 256 resolution using imresize().
+
+I2 = imresize(I, [256 256]);
+figure;
+imshow(I2);
+
+%% L1.5
+% Manually select and crop a region in the image that contains your face alone.
+% For instance, if your face lies within a rectangle with corners
+% (y_topleft,x_topleft), (y_bottomright, x_bottomright), 
+% then use face_image = full_image(y_topleft:y_bottomright, x_topleft:x_bottomright,:).
+
+y_topleft = 110;
+y_bottomright = 730;
+x_topleft = 260;
+x_bottomright = 680;
+face_image = I(y_topleft:y_bottomright, x_topleft:x_bottomright, :);
+figure;
+imshow(face_image);
+
+%% L1.6
+% Replace the region of your face with a box that has White, Black, Red, Blue, and Green stripes.
+
+width = (x_bottomright - x_topleft) / 5;
+height = y_bottomright - y_topleft;
+
+figure;
+imshow(I);
+rectangle('Position', [x_topleft y_topleft width height], 'FaceColor', 'w');
+rectangle('Position', [x_topleft+width y_topleft width height], 'FaceColor', 'k');
+rectangle('Position', [x_topleft+(2*width) y_topleft width height], 'FaceColor', 'r');
+rectangle('Position', [x_topleft+(3*width) y_topleft width height], 'FaceColor', 'b');
+rectangle('Position', [x_topleft+(4*width) y_topleft width height], 'FaceColor', 'g');
+
+%% L1.7
+% Resize face image to 64 × 64 resolution.
+
+I3 = imresize(face_image, [64 64]);
+figure;
+imshow(I3);
+
+%% L1.8
+% Save your resized full image and face image using imwrite().
+
+imwrite(I2, 'resized_full_image.jpg');
+imwrite(I3, 'resized_face_image.jpg');
+
+I_full = imread('resized_full_image.jpg');
+I_face = imread('resized_face_image.jpg');
+
+figure;
+imshow(I_full);
+figure;
+imshow(I_face);
+
+%% L1.9
+% Plot a histogram of intensities in your full and face images for each color channel.
+% Use hist() to compute histograms and plot() to plot each histogram.
+
+Ir = I(:, :, 1);
+Ig = I(:, :, 2);
+Ib = I(:, :, 3);
+
+fr = face_image(:, :, 1);
+fg = face_image(:, :, 2);
+fb = face_image(:, :, 3);
+
+fullr = hist(double(Ir(:)), 255);
+fullg = hist(double(Ig(:)), 255);
+fullb = hist(double(Ib(:)), 255);
+
+facer = hist(double(fr(:)), 255);
+faceg = hist(double(fg(:)), 255);
+faceb = hist(double(fb(:)), 255);
+
+figure;
+bar(fullr, 'r');
+title('Full Image Red Channel');
+figure;
+bar(fullg, 'g');
+title('Full Image Green Channel');
+figure;
+bar(fullb, 'b');
+title('Full Image Blue Channel');
+
+figure;
+bar(facer, 'r');
+title('Face Image Red Channel');
+figure;
+bar(faceg, 'g');
+title('Face Image Green Channel');
+figure;
+bar(faceb, 'b');
+title('Face Image Blue Channel');
+##### SOURCE END #####
+--></body></html>
