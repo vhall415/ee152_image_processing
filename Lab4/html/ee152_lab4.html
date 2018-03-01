@@ -1,0 +1,677 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>EE 152 Lab4: Multiscale Representation and Image Enhancements - Victoria Hall, 861154075</title><meta name="generator" content="MATLAB 9.2"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2018-03-01"><meta name="DC.source" content="ee152_lab4.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>EE 152 Lab4: Multiscale Representation and Image Enhancements - Victoria Hall, 861154075</h1><!--introduction--><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">L4.1 Multiscale image representation:</a></li></ul></div><h2 id="1">L4.1 Multiscale image representation:</h2><p>Part a</p><pre class="codeinput">G = imread(<span class="string">'portrait.jpg'</span>);
+G_gray = rgb2gray(G);
+
+figure;
+imshow(G_gray, <span class="string">'InitialMagnification'</span>, <span class="string">'fit'</span>);
+title(<span class="string">'Portrait Image'</span>);
+
+G0 = imresize(G_gray, [256 256]);
+
+figure;
+imshow(G0, <span class="string">'InitialMagnification'</span>, <span class="string">'fit'</span>);
+title(<span class="string">'Portrait Resized to 256x256'</span>);
+
+<span class="comment">% G0r = G0(:,:,1);</span>
+<span class="comment">% G0g = G0(:,:,2);</span>
+<span class="comment">% G0b = G0(:,:,3);</span>
+<span class="comment">%</span>
+<span class="comment">% hist_r = hist(double(G0(:)),255);</span>
+<span class="comment">% hist_g = hist(double(G0g(:)),255);</span>
+<span class="comment">% hist_b = hist(double(G0b(:)),255);</span>
+
+figure;
+bar(hist(double(G0(:)),255));
+title(<span class="string">'Histogram of Image'</span>);
+</pre><img vspace="5" hspace="5" src="ee152_lab4_01.png" style="width:560px;height:420px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab4_02.png" style="width:560px;height:420px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab4_03.png" style="width:560px;height:420px;" alt=""> <p>Part b</p><pre class="codeinput">g = fspecial(<span class="string">'gaussian'</span>, 128, 1.7); <span class="comment">% filter of half image size</span>
+g_pad = padarray(g, [64 64]);   <span class="comment">% zero padding to make filter 256x256</span>
+g_fft = fftshift(fft2(g_pad));
+<span class="comment">% g_pad = padarray(g_pad, [1 1], 'replicate', 'post');</span>
+<span class="comment">% G0_filt = imfilter(G0, g_pad);</span>
+
+figure;
+imagesc(g_pad);
+title(<span class="string">'Gaussian Filter Plot'</span>);
+figure;
+imagesc(log(abs(g_fft)));
+title(<span class="string">'Magnitude of Gaussian Filter Fourier Transform'</span>);
+figure;
+imagesc(angle(g_fft));
+title(<span class="string">'Angle of Gaussian Filter Fourier Transform'</span>);
+</pre><img vspace="5" hspace="5" src="ee152_lab4_04.png" style="width:560px;height:420px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab4_05.png" style="width:560px;height:420px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab4_06.png" style="width:560px;height:420px;" alt=""> <p>Part c</p><pre class="codeinput">g1 = g_pad;
+g2 = conv2(g_pad, g_pad);
+g3 = conv2(g2, g_pad);
+
+G1 = imfilter(G0, g1);   <span class="comment">% blurred image</span>
+G1_fft = fftshift(fft2(G1));
+G1_size = imresize(G1, [128 128]);
+
+figure;
+imshow(G1, <span class="string">'InitialMagnification'</span>, <span class="string">'fit'</span>);
+title(<span class="string">'Blurred Image G1'</span>);
+figure;
+imagesc(log(abs(G1_fft)));
+title(<span class="string">'Blurred Image G1 Fourier Transform Magnitude'</span>);
+figure;
+imshow(G1_size, <span class="string">'InitialMagnification'</span>, <span class="string">'fit'</span>);
+title(<span class="string">'G1 Scaled to 128x128'</span>);
+
+G2 = imfilter(G1, g2);   <span class="comment">% blurred image</span>
+G2_fft = fftshift(fft2(G2));
+G2_size = imresize(G2, [64 64]);
+
+figure;
+imshow(G2, <span class="string">'InitialMagnification'</span>, <span class="string">'fit'</span>);
+title(<span class="string">'Blurred Image G2'</span>);
+figure;
+imagesc(log(abs(G2_fft)));
+title(<span class="string">'Blurred Image G2 Fourier Transform Magnitude'</span>);
+figure;
+imshow(G2_size, <span class="string">'InitialMagnification'</span>, <span class="string">'fit'</span>);
+title(<span class="string">'G2 Scaled to 64x64'</span>);
+
+G3 = imfilter(G2, g3);   <span class="comment">% blurred image</span>
+G3_fft = fftshift(fft2(G3));
+G3_size = imresize(G3, [32 32]);
+
+figure;
+imshow(G3, <span class="string">'InitialMagnification'</span>, <span class="string">'fit'</span>);
+title(<span class="string">'Blurred Image G3'</span>);
+figure;
+imagesc(log(abs(G3_fft)));
+title(<span class="string">'Blurred Image G3 Fourier Transform Magnitude'</span>);
+figure;
+imshow(G3_size, <span class="string">'InitialMagnification'</span>, <span class="string">'fit'</span>);
+title(<span class="string">'G3 Scaled to 32x32'</span>);
+</pre><img vspace="5" hspace="5" src="ee152_lab4_07.png" style="width:560px;height:420px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab4_08.png" style="width:560px;height:420px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab4_09.png" style="width:560px;height:420px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab4_10.png" style="width:560px;height:420px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab4_11.png" style="width:560px;height:420px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab4_12.png" style="width:560px;height:420px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab4_13.png" style="width:560px;height:420px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab4_14.png" style="width:560px;height:420px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab4_15.png" style="width:560px;height:420px;" alt=""> <p>Part d</p><pre class="codeinput">L0 = imsubtract(G0, G1);
+L1 = imsubtract(G1, G2);
+L2 = imsubtract(G2, G3);
+
+L0_fft = fftshift(fft2(L0));
+L1_fft = fftshift(fft2(L1));
+L2_fft = fftshift(fft2(L2));
+
+L0_size = imresize(L0, [128 128]);
+L1_size = imresize(L1, [64 64]);
+L2_size = imresize(L2, [32 32]);
+
+figure;
+imshow(L0, <span class="string">'InitialMagnification'</span>, <span class="string">'fit'</span>);
+title(<span class="string">'L0 Image'</span>);
+figure;
+imagesc(log(abs(L0_fft)));
+title(<span class="string">'L0 Fourier Transform Magnitude'</span>);
+figure;
+imshow(L0_size, <span class="string">'InitialMagnification'</span>, <span class="string">'fit'</span>);
+title(<span class="string">'L0 Scaled to 128x128'</span>);
+
+figure;
+imshow(L1, <span class="string">'InitialMagnification'</span>, <span class="string">'fit'</span>);
+title(<span class="string">'L1 Image'</span>);
+figure;
+imagesc(log(abs(L1_fft)));
+title(<span class="string">'L1 Fourier Transform Magnitude'</span>);
+figure;
+imshow(L1_size, <span class="string">'InitialMagnification'</span>, <span class="string">'fit'</span>);
+title(<span class="string">'L1 Scaled to 64x64'</span>);
+
+figure;
+imshow(L2, <span class="string">'InitialMagnification'</span>, <span class="string">'fit'</span>);
+title(<span class="string">'L2 Image'</span>);
+figure;
+imagesc(log(abs(L2_fft)));
+title(<span class="string">'L2 Fourier Transform Magnitude'</span>);
+figure;
+imshow(L2_size, <span class="string">'InitialMagnification'</span>, <span class="string">'fit'</span>);
+title(<span class="string">'L2 Scaled to 32x32'</span>);
+</pre><img vspace="5" hspace="5" src="ee152_lab4_16.png" style="width:560px;height:420px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab4_17.png" style="width:560px;height:420px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab4_18.png" style="width:560px;height:420px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab4_19.png" style="width:560px;height:420px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab4_20.png" style="width:560px;height:420px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab4_21.png" style="width:560px;height:420px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab4_22.png" style="width:560px;height:420px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab4_23.png" style="width:560px;height:420px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab4_24.png" style="width:560px;height:420px;" alt=""> <p>Part e</p><pre class="codeinput">C = zeros(256,256,3);
+<span class="keyword">for</span> i = 1:3
+    <span class="keyword">if</span> i == 1
+        [CA1, CH1, CV1, CD1] = dwt2(G0, <span class="string">'haar'</span>, <span class="string">'mode'</span>, <span class="string">'per'</span>);
+        CT1 = [CA1 CV1; CH1 CD1];
+    <span class="keyword">elseif</span> i == 2
+        [CA2, CH2, CV2, CD2] = dwt2(CA1, <span class="string">'haar'</span>, <span class="string">'mode'</span>, <span class="string">'per'</span>);
+        CT2 = [CA2 CV2; CH2 CD2];
+        CT1 = [CT2 CV1; CH1 CD1];
+    <span class="keyword">elseif</span> i ==3
+        [CA3, CH3, CV3, CD3] = dwt2(CA2, <span class="string">'haar'</span>, <span class="string">'mode'</span>, <span class="string">'per'</span>);
+        CT3 = [CA3 CV3; CH3 CD3];
+        CT2 = [CT3 CV2; CH2 CD2];
+        CT1 = [CT2 CV1; CH1 CD1];
+    <span class="keyword">end</span>
+    C(:,:,i) = CT1;
+    figure;
+    colormap <span class="string">gray</span>;
+    imagesc(C(:,:,i));
+    title([<span class="string">'Wavelet Coefficients Plot '</span> num2str(i)]);
+<span class="keyword">end</span>
+</pre><img vspace="5" hspace="5" src="ee152_lab4_25.png" style="width:560px;height:420px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab4_26.png" style="width:560px;height:420px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab4_27.png" style="width:560px;height:420px;" alt=""> <p>Part f</p><pre class="codeinput">CAt2 = idwt2(CA3, CH3, CV3, CD3, <span class="string">'haar'</span>, <span class="string">'mode'</span>, <span class="string">'per'</span>);
+CAt1 = idwt2(CAt2, CH2, CV2, CD2, <span class="string">'haar'</span>, <span class="string">'mode'</span>, <span class="string">'per'</span>);
+CAt0 = idwt2(CAt1, CH1, CV1, CD1, <span class="string">'haar'</span>, <span class="string">'mode'</span>, <span class="string">'per'</span>);
+
+figure;
+colormap <span class="string">gray</span>;
+imagesc(CAt0);
+title(<span class="string">'Image Reconstructed from Wavelet Coefficients'</span>);
+</pre><img vspace="5" hspace="5" src="ee152_lab4_28.png" style="width:560px;height:420px;" alt=""> <p>Part g</p><pre class="codeinput">z32 = zeros(32,32);
+z64 = zeros(64,64);
+z128 = zeros(128,128);
+
+<span class="comment">% for CA3</span>
+CAt2 = idwt2(CA3, z32, z32, z32, <span class="string">'haar'</span>, <span class="string">'mode'</span>, <span class="string">'per'</span>);
+CAt1 = idwt2(CAt2, z64, z64, z64, <span class="string">'haar'</span>, <span class="string">'mode'</span>, <span class="string">'per'</span>);
+CAt0 = idwt2(CAt1, z128, z128, z128, <span class="string">'haar'</span>, <span class="string">'mode'</span>, <span class="string">'per'</span>);
+CAt0_fft = fftshift(fft2(CAt0));
+
+figure;
+colormap <span class="string">gray</span>;
+imagesc(CAt0);
+title(<span class="string">'Reconstructed Image Using CA3'</span>);
+figure;
+imagesc(log(abs(CAt0_fft)));
+title(<span class="string">'Fourier Transform Magnitude For Reconstructed Image Using CA3'</span>);
+
+<span class="comment">% for CH3</span>
+CAt2 = idwt2(z32, CH3, z32, z32, <span class="string">'haar'</span>, <span class="string">'mode'</span>, <span class="string">'per'</span>);
+CAt1 = idwt2(CAt2, z64, z64, z64, <span class="string">'haar'</span>, <span class="string">'mode'</span>, <span class="string">'per'</span>);
+CAt0 = idwt2(CAt1, z128, z128, z128, <span class="string">'haar'</span>, <span class="string">'mode'</span>, <span class="string">'per'</span>);
+CAt0_fft = fftshift(fft2(CAt0));
+
+figure;
+colormap <span class="string">gray</span>;
+imagesc(CAt0);
+title(<span class="string">'Reconstructed Image Using CH3'</span>);
+figure;
+imagesc(log(abs(CAt0_fft)));
+title(<span class="string">'Fourier Transform Magnitude For Reconstructed Image Using CH3'</span>);
+
+<span class="comment">% for CV3</span>
+CAt2 = idwt2(z32, z32, CV3, z32, <span class="string">'haar'</span>, <span class="string">'mode'</span>, <span class="string">'per'</span>);
+CAt1 = idwt2(CAt2, z64, z64, z64, <span class="string">'haar'</span>, <span class="string">'mode'</span>, <span class="string">'per'</span>);
+CAt0 = idwt2(CAt1, z128, z128, z128, <span class="string">'haar'</span>, <span class="string">'mode'</span>, <span class="string">'per'</span>);
+CAt0_fft = fftshift(fft2(CAt0));
+
+figure;
+colormap <span class="string">gray</span>;
+imagesc(CAt0);
+title(<span class="string">'Reconstructed Image Using CV3'</span>);
+figure;
+imagesc(log(abs(CAt0_fft)));
+title(<span class="string">'Fourier Transform Magnitude For Reconstructed Image Using CV3'</span>);
+
+<span class="comment">% for CD3</span>
+CAt2 = idwt2(z32, z32, z32, CD3, <span class="string">'haar'</span>, <span class="string">'mode'</span>, <span class="string">'per'</span>);
+CAt1 = idwt2(CAt2, z64, z64, z64, <span class="string">'haar'</span>, <span class="string">'mode'</span>, <span class="string">'per'</span>);
+CAt0 = idwt2(CAt1, z128, z128, z128, <span class="string">'haar'</span>, <span class="string">'mode'</span>, <span class="string">'per'</span>);
+CAt0_fft = fftshift(fft2(CAt0));
+
+figure;
+colormap <span class="string">gray</span>;
+imagesc(CAt0);
+title(<span class="string">'Reconstructed Image Using CD3'</span>);
+figure;
+imagesc(log(abs(CAt0_fft)));
+title(<span class="string">'Fourier Transform Magnitude For Reconstructed Image Using CD3'</span>);
+
+<span class="comment">% for CH2</span>
+CAt1 = idwt2(z64, CH2, z64, z64, <span class="string">'haar'</span>, <span class="string">'mode'</span>, <span class="string">'per'</span>);
+CAt0 = idwt2(CAt1, z128, z128, z128, <span class="string">'haar'</span>, <span class="string">'mode'</span>, <span class="string">'per'</span>);
+CAt0_fft = fftshift(fft2(CAt0));
+
+figure;
+colormap <span class="string">gray</span>;
+imagesc(CAt0);
+title(<span class="string">'Reconstructed Image Using CH2'</span>);
+figure;
+imagesc(log(abs(CAt0_fft)));
+title(<span class="string">'Fourier Transform Magnitude For Reconstructed Image Using CH2'</span>);
+
+<span class="comment">% for CV2</span>
+CAt1 = idwt2(z64, z64, CV2, z64, <span class="string">'haar'</span>, <span class="string">'mode'</span>, <span class="string">'per'</span>);
+CAt0 = idwt2(CAt1, z128, z128, z128, <span class="string">'haar'</span>, <span class="string">'mode'</span>, <span class="string">'per'</span>);
+CAt0_fft = fftshift(fft2(CAt0));
+
+figure;
+colormap <span class="string">gray</span>;
+imagesc(CAt0);
+title(<span class="string">'Reconstructed Image Using CV2'</span>);
+figure;
+imagesc(log(abs(CAt0_fft)));
+title(<span class="string">'Fourier Transform Magnitude For Reconstructed Image Using CV2'</span>);
+
+<span class="comment">% for CD2</span>
+CAt1 = idwt2(z64, z64, z64, CD2, <span class="string">'haar'</span>, <span class="string">'mode'</span>, <span class="string">'per'</span>);
+CAt0 = idwt2(CAt1, z128, z128, z128, <span class="string">'haar'</span>, <span class="string">'mode'</span>, <span class="string">'per'</span>);
+CAt0_fft = fftshift(fft2(CAt0));
+
+figure;
+colormap <span class="string">gray</span>;
+imagesc(CAt0);
+title(<span class="string">'Reconstructed Image Using CD2'</span>);
+figure;
+imagesc(log(abs(CAt0_fft)));
+title(<span class="string">'Fourier Transform Magnitude For Reconstructed Image Using CD2'</span>);
+
+<span class="comment">% for CH1</span>
+CAt0 = idwt2(z128, CH1, z128, z128, <span class="string">'haar'</span>, <span class="string">'mode'</span>, <span class="string">'per'</span>);
+CAt0_fft = fftshift(fft2(CAt0));
+
+figure;
+colormap <span class="string">gray</span>;
+imagesc(CAt0);
+title(<span class="string">'Reconstructed Image Using CH1'</span>);
+figure;
+imagesc(log(abs(CAt0_fft)));
+title(<span class="string">'Fourier Transform Magnitude For Reconstructed Image Using CH1'</span>);
+
+<span class="comment">% for CV1</span>
+CAt0 = idwt2(z128, z128, CV1, z128, <span class="string">'haar'</span>, <span class="string">'mode'</span>, <span class="string">'per'</span>);
+CAt0_fft = fftshift(fft2(CAt0));
+
+figure;
+colormap <span class="string">gray</span>;
+imagesc(CAt0);
+title(<span class="string">'Reconstructed Image Using CV1'</span>);
+figure;
+imagesc(log(abs(CAt0_fft)));
+title(<span class="string">'Fourier Transform Magnitude For Reconstructed Image Using CV1'</span>);
+
+<span class="comment">% for CD1</span>
+CAt0 = idwt2(z128, z128, z128, CD1, <span class="string">'haar'</span>, <span class="string">'mode'</span>, <span class="string">'per'</span>);
+CAt0_fft = fftshift(fft2(CAt0));
+
+figure;
+colormap <span class="string">gray</span>;
+imagesc(CAt0);
+title(<span class="string">'Reconstructed Image Using CD1'</span>);
+figure;
+imagesc(log(abs(CAt0_fft)));
+title(<span class="string">'Fourier Transform Magnitude For Reconstructed Image Using CD1'</span>);
+</pre><img vspace="5" hspace="5" src="ee152_lab4_29.png" style="width:560px;height:420px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab4_30.png" style="width:560px;height:420px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab4_31.png" style="width:560px;height:420px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab4_32.png" style="width:560px;height:420px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab4_33.png" style="width:560px;height:420px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab4_34.png" style="width:560px;height:420px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab4_35.png" style="width:560px;height:420px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab4_36.png" style="width:560px;height:420px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab4_37.png" style="width:560px;height:420px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab4_38.png" style="width:560px;height:420px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab4_39.png" style="width:560px;height:420px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab4_40.png" style="width:560px;height:420px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab4_41.png" style="width:560px;height:420px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab4_42.png" style="width:560px;height:420px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab4_43.png" style="width:560px;height:420px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab4_44.png" style="width:560px;height:420px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab4_45.png" style="width:560px;height:420px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab4_46.png" style="width:560px;height:420px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab4_47.png" style="width:560px;height:420px;" alt=""> <img vspace="5" hspace="5" src="ee152_lab4_48.png" style="width:560px;height:420px;" alt=""> <p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2017a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% EE 152 Lab4: Multiscale Representation and Image Enhancements - Victoria Hall, 861154075
+
+%% L4.1 Multiscale image representation:
+% Part a
+
+G = imread('portrait.jpg');
+G_gray = rgb2gray(G);
+
+figure;
+imshow(G_gray, 'InitialMagnification', 'fit');
+title('Portrait Image');
+
+G0 = imresize(G_gray, [256 256]);
+
+figure;
+imshow(G0, 'InitialMagnification', 'fit');
+title('Portrait Resized to 256x256');
+
+% G0r = G0(:,:,1);
+% G0g = G0(:,:,2);
+% G0b = G0(:,:,3);
+% 
+% hist_r = hist(double(G0(:)),255);
+% hist_g = hist(double(G0g(:)),255);
+% hist_b = hist(double(G0b(:)),255);
+
+figure;
+bar(hist(double(G0(:)),255));
+title('Histogram of Image');
+
+%%
+% Part b
+
+g = fspecial('gaussian', 128, 1.7); % filter of half image size
+g_pad = padarray(g, [64 64]);   % zero padding to make filter 256x256
+g_fft = fftshift(fft2(g_pad));
+% g_pad = padarray(g_pad, [1 1], 'replicate', 'post');
+% G0_filt = imfilter(G0, g_pad);
+
+figure;
+imagesc(g_pad);
+title('Gaussian Filter Plot');
+figure;
+imagesc(log(abs(g_fft)));
+title('Magnitude of Gaussian Filter Fourier Transform');
+figure;
+imagesc(angle(g_fft));
+title('Angle of Gaussian Filter Fourier Transform');
+
+%%
+% Part c
+
+g1 = g_pad;
+g2 = conv2(g_pad, g_pad);
+g3 = conv2(g2, g_pad);
+
+G1 = imfilter(G0, g1);   % blurred image
+G1_fft = fftshift(fft2(G1));
+G1_size = imresize(G1, [128 128]);
+
+figure;
+imshow(G1, 'InitialMagnification', 'fit');
+title('Blurred Image G1');
+figure;
+imagesc(log(abs(G1_fft)));
+title('Blurred Image G1 Fourier Transform Magnitude');
+figure;
+imshow(G1_size, 'InitialMagnification', 'fit');
+title('G1 Scaled to 128x128');
+
+G2 = imfilter(G1, g2);   % blurred image
+G2_fft = fftshift(fft2(G2));
+G2_size = imresize(G2, [64 64]);
+
+figure;
+imshow(G2, 'InitialMagnification', 'fit');
+title('Blurred Image G2');
+figure;
+imagesc(log(abs(G2_fft)));
+title('Blurred Image G2 Fourier Transform Magnitude');
+figure;
+imshow(G2_size, 'InitialMagnification', 'fit');
+title('G2 Scaled to 64x64');
+
+G3 = imfilter(G2, g3);   % blurred image
+G3_fft = fftshift(fft2(G3));
+G3_size = imresize(G3, [32 32]);
+
+figure;
+imshow(G3, 'InitialMagnification', 'fit');
+title('Blurred Image G3');
+figure;
+imagesc(log(abs(G3_fft)));
+title('Blurred Image G3 Fourier Transform Magnitude');
+figure;
+imshow(G3_size, 'InitialMagnification', 'fit');
+title('G3 Scaled to 32x32');
+
+%%
+% Part d
+
+L0 = imsubtract(G0, G1);
+L1 = imsubtract(G1, G2);
+L2 = imsubtract(G2, G3);
+
+L0_fft = fftshift(fft2(L0));
+L1_fft = fftshift(fft2(L1));
+L2_fft = fftshift(fft2(L2));
+
+L0_size = imresize(L0, [128 128]);
+L1_size = imresize(L1, [64 64]);
+L2_size = imresize(L2, [32 32]);
+
+figure;
+imshow(L0, 'InitialMagnification', 'fit');
+title('L0 Image');
+figure;
+imagesc(log(abs(L0_fft)));
+title('L0 Fourier Transform Magnitude');
+figure;
+imshow(L0_size, 'InitialMagnification', 'fit');
+title('L0 Scaled to 128x128');
+
+figure;
+imshow(L1, 'InitialMagnification', 'fit');
+title('L1 Image');
+figure;
+imagesc(log(abs(L1_fft)));
+title('L1 Fourier Transform Magnitude');
+figure;
+imshow(L1_size, 'InitialMagnification', 'fit');
+title('L1 Scaled to 64x64');
+
+figure;
+imshow(L2, 'InitialMagnification', 'fit');
+title('L2 Image');
+figure;
+imagesc(log(abs(L2_fft)));
+title('L2 Fourier Transform Magnitude');
+figure;
+imshow(L2_size, 'InitialMagnification', 'fit');
+title('L2 Scaled to 32x32');
+
+%% 
+% Part e
+
+C = zeros(256,256,3);
+for i = 1:3
+    if i == 1
+        [CA1, CH1, CV1, CD1] = dwt2(G0, 'haar', 'mode', 'per');
+        CT1 = [CA1 CV1; CH1 CD1];
+    elseif i == 2
+        [CA2, CH2, CV2, CD2] = dwt2(CA1, 'haar', 'mode', 'per');
+        CT2 = [CA2 CV2; CH2 CD2];
+        CT1 = [CT2 CV1; CH1 CD1];
+    elseif i ==3
+        [CA3, CH3, CV3, CD3] = dwt2(CA2, 'haar', 'mode', 'per');
+        CT3 = [CA3 CV3; CH3 CD3];
+        CT2 = [CT3 CV2; CH2 CD2];
+        CT1 = [CT2 CV1; CH1 CD1];
+    end
+    C(:,:,i) = CT1;
+    figure;
+    colormap gray;
+    imagesc(C(:,:,i));
+    title(['Wavelet Coefficients Plot ' num2str(i)]);
+end
+    
+%%
+% Part f
+
+CAt2 = idwt2(CA3, CH3, CV3, CD3, 'haar', 'mode', 'per');
+CAt1 = idwt2(CAt2, CH2, CV2, CD2, 'haar', 'mode', 'per');
+CAt0 = idwt2(CAt1, CH1, CV1, CD1, 'haar', 'mode', 'per');
+
+figure;
+colormap gray;
+imagesc(CAt0);
+title('Image Reconstructed from Wavelet Coefficients');
+
+%%
+% Part g
+
+z32 = zeros(32,32);
+z64 = zeros(64,64);
+z128 = zeros(128,128);
+
+% for CA3
+CAt2 = idwt2(CA3, z32, z32, z32, 'haar', 'mode', 'per');
+CAt1 = idwt2(CAt2, z64, z64, z64, 'haar', 'mode', 'per');
+CAt0 = idwt2(CAt1, z128, z128, z128, 'haar', 'mode', 'per');
+CAt0_fft = fftshift(fft2(CAt0));
+
+figure;
+colormap gray;
+imagesc(CAt0);
+title('Reconstructed Image Using CA3');
+figure;
+imagesc(log(abs(CAt0_fft)));
+title('Fourier Transform Magnitude For Reconstructed Image Using CA3');
+
+% for CH3
+CAt2 = idwt2(z32, CH3, z32, z32, 'haar', 'mode', 'per');
+CAt1 = idwt2(CAt2, z64, z64, z64, 'haar', 'mode', 'per');
+CAt0 = idwt2(CAt1, z128, z128, z128, 'haar', 'mode', 'per');
+CAt0_fft = fftshift(fft2(CAt0));
+
+figure;
+colormap gray;
+imagesc(CAt0);
+title('Reconstructed Image Using CH3');
+figure;
+imagesc(log(abs(CAt0_fft)));
+title('Fourier Transform Magnitude For Reconstructed Image Using CH3');
+
+% for CV3
+CAt2 = idwt2(z32, z32, CV3, z32, 'haar', 'mode', 'per');
+CAt1 = idwt2(CAt2, z64, z64, z64, 'haar', 'mode', 'per');
+CAt0 = idwt2(CAt1, z128, z128, z128, 'haar', 'mode', 'per');
+CAt0_fft = fftshift(fft2(CAt0));
+
+figure;
+colormap gray;
+imagesc(CAt0);
+title('Reconstructed Image Using CV3');
+figure;
+imagesc(log(abs(CAt0_fft)));
+title('Fourier Transform Magnitude For Reconstructed Image Using CV3');
+
+% for CD3
+CAt2 = idwt2(z32, z32, z32, CD3, 'haar', 'mode', 'per');
+CAt1 = idwt2(CAt2, z64, z64, z64, 'haar', 'mode', 'per');
+CAt0 = idwt2(CAt1, z128, z128, z128, 'haar', 'mode', 'per');
+CAt0_fft = fftshift(fft2(CAt0));
+
+figure;
+colormap gray;
+imagesc(CAt0);
+title('Reconstructed Image Using CD3');
+figure;
+imagesc(log(abs(CAt0_fft)));
+title('Fourier Transform Magnitude For Reconstructed Image Using CD3');
+
+% for CH2
+CAt1 = idwt2(z64, CH2, z64, z64, 'haar', 'mode', 'per');
+CAt0 = idwt2(CAt1, z128, z128, z128, 'haar', 'mode', 'per');
+CAt0_fft = fftshift(fft2(CAt0));
+
+figure;
+colormap gray;
+imagesc(CAt0);
+title('Reconstructed Image Using CH2');
+figure;
+imagesc(log(abs(CAt0_fft)));
+title('Fourier Transform Magnitude For Reconstructed Image Using CH2');
+
+% for CV2
+CAt1 = idwt2(z64, z64, CV2, z64, 'haar', 'mode', 'per');
+CAt0 = idwt2(CAt1, z128, z128, z128, 'haar', 'mode', 'per');
+CAt0_fft = fftshift(fft2(CAt0));
+
+figure;
+colormap gray;
+imagesc(CAt0);
+title('Reconstructed Image Using CV2');
+figure;
+imagesc(log(abs(CAt0_fft)));
+title('Fourier Transform Magnitude For Reconstructed Image Using CV2');
+
+% for CD2
+CAt1 = idwt2(z64, z64, z64, CD2, 'haar', 'mode', 'per');
+CAt0 = idwt2(CAt1, z128, z128, z128, 'haar', 'mode', 'per');
+CAt0_fft = fftshift(fft2(CAt0));
+
+figure;
+colormap gray;
+imagesc(CAt0);
+title('Reconstructed Image Using CD2');
+figure;
+imagesc(log(abs(CAt0_fft)));
+title('Fourier Transform Magnitude For Reconstructed Image Using CD2');
+
+% for CH1
+CAt0 = idwt2(z128, CH1, z128, z128, 'haar', 'mode', 'per');
+CAt0_fft = fftshift(fft2(CAt0));
+
+figure;
+colormap gray;
+imagesc(CAt0);
+title('Reconstructed Image Using CH1');
+figure;
+imagesc(log(abs(CAt0_fft)));
+title('Fourier Transform Magnitude For Reconstructed Image Using CH1');
+
+% for CV1
+CAt0 = idwt2(z128, z128, CV1, z128, 'haar', 'mode', 'per');
+CAt0_fft = fftshift(fft2(CAt0));
+
+figure;
+colormap gray;
+imagesc(CAt0);
+title('Reconstructed Image Using CV1');
+figure;
+imagesc(log(abs(CAt0_fft)));
+title('Fourier Transform Magnitude For Reconstructed Image Using CV1');
+
+% for CD1
+CAt0 = idwt2(z128, z128, z128, CD1, 'haar', 'mode', 'per');
+CAt0_fft = fftshift(fft2(CAt0));
+
+figure;
+colormap gray;
+imagesc(CAt0);
+title('Reconstructed Image Using CD1');
+figure;
+imagesc(log(abs(CAt0_fft)));
+title('Fourier Transform Magnitude For Reconstructed Image Using CD1');
+##### SOURCE END #####
+--></body></html>
